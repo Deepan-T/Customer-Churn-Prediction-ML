@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Churn Prediction</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            padding: 30px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #0f172a;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-box label {
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .input-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .predict-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Result */
+
+        .result-section {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 15px;
+            background: #f8fafc;
+            text-align: center;
+        }
+
+        .result-section h2 {
+            color: #0f172a;
+            margin-bottom: 15px;
+        }
+
+        .final-result {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #2563eb;
+        }
+
+        .model-results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .model-card {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .model-card h3 {
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .model-card p {
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .model-results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <h1>Customer Churn Prediction</h1>
+
+            <p>
+                Machine Learning Based Customer Churn Prediction System
+            </p>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form action="/predict" method="POST">
+
+            <div class="form-grid">
+
+
+                <!-- 1. AGE -->
+
+                <div class="input-box">
+
+                    <label for="Age">Age</label>
+
+                    <input
+                        type="number"
+                        id="Age"
+                        name="Age"
+                        placeholder="Enter age"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 2. TENURE -->
+
+                <div class="input-box">
+
+                    <label for="Tenure_Months">
+                        Tenure (Months)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="Tenure_Months"
+                        name="Tenure_Months"
+                        placeholder="Enter tenure"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 3. MONTHLY USAGE -->
+
+                <div class="input-box">
+
+                    <label for="Monthly_Usage_Hours">
+                        Monthly Usage Hours
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        id="Monthly_Usage_Hours"
+                        name="Monthly_Usage_Hours"
+                        placeholder="Enter usage hours"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 4. SUPPORT TICKETS -->
+
+                <div class="input-box">
+
+                    <label for="Support_Tickets">
+                        Support Tickets
+                    </label>
+
+                    <input
+                        type="number"
+                        id="Support_Tickets"
+                        name="Support_Tickets"
+                        placeholder="Enter support tickets"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 5. SATISFACTION -->
+
+                <div class="input-box">
+
+                    <label for="Satisfaction_Score">
+                        Satisfaction Score (1-10)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        min="1"
+                        max="10"
+                        id="Satisfaction_Score"
+                        name="Satisfaction_Score"
+                        placeholder="Enter satisfaction"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 6. MONTHLY CHARGES -->
+
+                <div class="input-box">
+
+                    <label for="Monthly_Charges">
+                        Monthly Charges
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="Monthly_Charges"
+                        name="Monthly_Charges"
+                        placeholder="Enter monthly charges"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 7. DATA USAGE -->
+
+                <div class="input-box">
+
+                    <label for="Data_Usage_GB">
+                        Data Usage (GB)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        id="Data_Usage_GB"
+                        name="Data_Usage_GB"
+                        placeholder="Enter data usage"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 8. PAYMENT DELAY -->
+
+                <div class="input-box">
+
+                    <label for="Payment_Delay_Days">
+                        Payment Delay (Days)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        id="Payment_Delay_Days"
+                        name="Payment_Delay_Days"
+                        placeholder="Enter payment delay"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 9. CONTRACT -->
+
+                <div class="input-box">
+
+                    <label for="Contract_Months">
+                        Contract (Months)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="Contract_Months"
+                        name="Contract_Months"
+                        placeholder="Enter contract duration"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 10. LOGIN DAYS -->
+
+                <div class="input-box">
+
+                    <label for="Avg_Login_Days">
+                        Average Login Days
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        id="Avg_Login_Days"
+                        name="Avg_Login_Days"
+                        placeholder="Enter average login days"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 11. SERVICE COUNT -->
+
+                <div class="input-box">
+
+                    <label for="Service_Count">
+                        Service Count
+                    </label>
+
+                    <input
+                        type="number"
+                        id="Service_Count"
+                        name="Service_Count"
+                        placeholder="Enter service count"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 12. DISCOUNT -->
+
+                <div class="input-box">
+
+                    <label for="Discount_Percent">
+                        Discount (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        id="Discount_Percent"
+                        name="Discount_Percent"
+                        placeholder="Enter discount percentage"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- PREDICT BUTTON -->
+
+            <button
+                type="submit"
+                class="predict-btn"
+            >
+                Predict Customer Churn
+            </button>
+
+        </form>
+
+
+        <!-- RESULT -->
+
+        {% if final_result %}
+
+        <div class="result-section">
+
+            <h2>Prediction Result</h2>
+
+            <div class="final-result">
+                {{ final_result }}
+            </div>
+
+
+            <div class="model-results">
+
+
+                <!-- MODEL 1 -->
+
+                <div class="model-card">
+
+                    <h3>Decision Tree</h3>
+
+                    <p>
+                        {{ result1 }}
+                    </p>
+
+                </div>
+
+
+                <!-- MODEL 2 -->
+
+                <div class="model-card">
+
+                    <h3>Random Forest</h3>
+
+                    <p>
+                        {{ result2 }}
+                    </p>
+
+                </div>
+
+
+                <!-- MODEL 3 -->
+
+                <div class="model-card">
+
+                    <h3>SVM</h3>
+
+                    <p>
+                        {{ result3 }}
+                    </p>
+
+                </div>
+
+
+                <!-- MODEL 4 -->
+
+                <div class="model-card">
+
+                    <h3>Logistic Regression</h3>
+
+                    <p>
+                        {{ result4 }}
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Customer ML Classification Project
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
